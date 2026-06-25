@@ -223,7 +223,3 @@ tests/                # inference · rag · agents
 ```bash
 pytest
 ```
-
-*Built as a portfolio project to demonstrate practical **AI inference**, **RAG**, and
-**agentic** system design. The telemetry and runbooks are illustrative samples; swap in
-real connectors to productionize.*
