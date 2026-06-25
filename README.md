@@ -16,7 +16,7 @@
 
 ---
 
-## 🎯 The problem
+## The problem
 
 When a service is on fire at 3 a.m., engineers burn precious minutes context-switching
 between dashboards, log search, and a wiki full of runbooks. The knowledge to fix the
@@ -26,7 +26,7 @@ incident *already exists* — it's just scattered and slow to assemble.
 evidence** (metrics + logs), **retrieves the right runbook** with RAG, and proposes a
 **grounded, dry-run remediation plan** — all running on **infrastructure you control**.
 
-## 💡 Why local inference?
+## Why local inference?
 
 This project deliberately centers **AI inference** as a first-class concern:
 
@@ -41,7 +41,7 @@ This project deliberately centers **AI inference** as a first-class concern:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```mermaid
 flowchart TD
@@ -75,7 +75,7 @@ flowchart TD
 
 ---
 
-## 🧠 Key AI concepts demonstrated
+## Key AI concepts demonstrated
 
 - **AI Inference** — pluggable backend (`OllamaClient`) with an `InferenceRouter` that
   records per-call telemetry and degrades gracefully.
@@ -87,7 +87,7 @@ flowchart TD
 
 ---
 
-## 🚀 Quickstart
+## Quickstart
 
 ### Option A — Run instantly (no GPU, no Ollama)
 The deterministic fallback engine makes InferOps runnable out of the box.
@@ -154,7 +154,7 @@ curl -s http://localhost:8000/api/v1/inference/metrics
 
 ---
 
-## 🧪 Sample agent trace
+## Sample agent trace
 
 ```text
 AGENT MODE · autonomous incident triage
@@ -181,7 +181,7 @@ Sources: pod_crashloop_oomkill.md
 
 ---
 
-## 🗂️ Project structure
+## Project structure
 
 ```
 app/
@@ -202,7 +202,7 @@ tests/                # inference · rag · agents
 
 ---
 
-## 🛠️ Tech stack
+## Tech stack
 
 **Python · FastAPI · Pydantic · httpx · NumPy** · **Ollama** (local inference) · deterministic offline fallback
 · **nomic-embed-text** embeddings · Docker.
@@ -219,7 +219,7 @@ tests/                # inference · rag · agents
 - [ ] **Model routing** (small fast model for planning, larger for synthesis)
 - [ ] Eval harness for retrieval quality & answer faithfulness
 
-## ✅ Run the tests
+## Run the tests
 ```bash
 pytest
 ```
