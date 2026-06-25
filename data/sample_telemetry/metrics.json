@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-06-24T11:02:20Z",
+  "cluster": "prod-us-east-1",
+  "services": {
+    "checkout-api": {
+      "owner": "payments-team",
+      "metrics": {
+        "cpu_pct": 93.5,
+        "memory_pct": 96.2,
+        "p99_latency_ms": 2150,
+        "p50_latency_ms": 240,
+        "error_rate_pct": 8.7,
+        "requests_per_sec": 1240,
+        "replicas": 3,
+        "restart_count_1h": 7,
+        "saturation": "critical"
+      },
+      "recent_logs": [
+        "2026-06-24T11:02:13Z ERROR OOMKilled container checkout-api exceeded memory limit 512Mi",
+        "2026-06-24T11:02:14Z WARN GC pause 480ms (allocation pressure rising)",
+        "2026-06-24T11:02:15Z ERROR upstream timeout calling payments-svc after 2000ms",
+        "2026-06-24T11:02:16Z ERROR pod checkout-api-7c9f4 restarted reason=CrashLoopBackOff",
+        "2026-06-24T11:02:18Z WARN cpu throttling observed 320ms per 1s period"
+      ]
+    },
+    "payments-svc": {
+      "owner": "payments-team",
+      "metrics": {
+        "cpu_pct": 41.0,
+        "memory_pct": 58.4,
+        "p99_latency_ms": 1900,
+        "p50_latency_ms": 180,
+        "error_rate_pct": 1.2,
+        "requests_per_sec": 980,
+        "replicas": 4,
+        "restart_count_1h": 0,
+        "saturation": "elevated"
+      },
+      "recent_logs": [
+        "2026-06-24T11:01:50Z WARN connection pool to ledger-db exhausted, waiting for slot",
+        "2026-06-24T11:01:55Z WARN slow query 1.4s on ledger-db (table=transactions)",
+        "2026-06-24T11:02:01Z INFO retry succeeded after 1 attempt"
+      ]
+    },
+    "inventory-worker": {
+      "owner": "fulfillment-team",
+      "metrics": {
+        "cpu_pct": 22.5,
+        "memory_pct": 39.0,
+        "disk_pct": 94.8,
+        "p99_latency_ms": 320,
+        "error_rate_pct": 0.4,
+        "queue_depth": 18400,
+        "replicas": 2,
+        "restart_count_1h": 1,
+        "saturation": "disk-pressure"
+      },
+      "recent_logs": [
+        "2026-06-24T11:00:10Z WARN disk usage 94% on /var/lib/data volume pvc-inv-0",
+        "2026-06-24T11:00:40Z ERROR failed to write checkpoint: no space left on device",
+        "2026-06-24T11:01:05Z WARN node tainted node.kubernetes.io/disk-pressure"
+      ]
+    }
+  }
+}

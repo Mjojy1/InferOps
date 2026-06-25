@@ -1,0 +1,15 @@
+[project]
+name = "inferops"
+version = "0.1.0"
+description = "InferOps — a local-inference DevOps/Observability copilot powered by RAG and autonomous agents."
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

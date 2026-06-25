@@ -1,0 +1,32 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: inferops-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    # Uncomment to enable GPU acceleration (NVIDIA Container Toolkit required)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  api:
+    build: .
+    container_name: inferops-api
+    environment:
+      - ENABLE_OLLAMA=true
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - LLM_MODEL=llama3.1
+      - EMBEDDING_MODEL=nomic-embed-text
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ollama
+
+volumes:
+  ollama: {}

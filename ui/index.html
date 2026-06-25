@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InferOps — Local-Inference SRE Copilot</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #141a2e;
+      --panel-2: #1b2440;
+      --accent: #6ea8fe;
+      --accent-2: #7ef0c0;
+      --text: #e6ebff;
+      --muted: #93a0c4;
+      --border: #283357;
+      --danger: #ff7a85;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(1200px 600px at 80% -10%, #1c2750 0%, var(--bg) 55%);
+      color: var(--text); min-height: 100vh;
+    }
+    header {
+      padding: 22px 28px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .logo {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid; place-items: center; font-weight: 800; color: #0b1020;
+    }
+    header h1 { font-size: 18px; margin: 0; letter-spacing: .3px; }
+    header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+    .badge {
+      margin-left: auto; font-size: 12px; color: var(--muted);
+      border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px;
+    }
+    .badge b { color: var(--accent-2); }
+    main { max-width: 980px; margin: 0 auto; padding: 26px; }
+    .composer {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 16px; padding: 18px; box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    textarea {
+      width: 100%; min-height: 76px; resize: vertical; background: var(--panel-2);
+      color: var(--text); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 14px; font-size: 15px; outline: none;
+    }
+    textarea:focus { border-color: var(--accent); }
+    .controls { display: flex; gap: 12px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+    select, input[type=text] {
+      background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none;
+    }
+    button {
+      margin-left: auto; background: linear-gradient(135deg, var(--accent), #4f7ff0);
+      color: #06112b; border: none; border-radius: 10px; padding: 11px 20px;
+      font-weight: 700; font-size: 14px; cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: progress; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .chip {
+      font-size: 12.5px; color: var(--muted); background: var(--panel-2);
+      border: 1px solid var(--border); padding: 7px 11px; border-radius: 999px; cursor: pointer;
+    }
+    .chip:hover { color: var(--text); border-color: var(--accent); }
+    .result { margin-top: 22px; display: none; }
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 16px; padding: 18px 20px; margin-bottom: 16px;
+    }
+    .card h3 { margin: 0 0 12px; font-size: 13px; text-transform: uppercase;
+      letter-spacing: 1.2px; color: var(--muted); }
+    .answer { white-space: pre-wrap; line-height: 1.6; font-size: 15px; }
+    .stats { display: flex; flex-wrap: wrap; gap: 10px; }
+    .stat {
+      flex: 1 1 120px; background: var(--panel-2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 14px;
+    }
+    .stat .k { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: .8px; }
+    .stat .v { font-size: 20px; font-weight: 700; margin-top: 4px; }
+    .stat .v small { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .pill { display:inline-block; padding:3px 9px; border-radius:999px; font-size:12px;
+      border:1px solid var(--border); }
+    .pill.ollama { color:#06112b; background: var(--accent-2); }
+    .pill.fallback { color: var(--text); background: var(--panel-2); }
+    .step { border-left: 2px solid var(--accent); padding: 4px 0 12px 16px; position: relative; }
+    .step::before { content:''; position:absolute; left:-7px; top:4px; width:12px; height:12px;
+      border-radius:50%; background: var(--accent); }
+    .step .act { font-weight: 700; color: var(--accent); }
+    .step .thought { color: var(--muted); font-style: italic; margin: 3px 0; font-size: 13.5px; }
+    .step pre { background: var(--panel-2); border:1px solid var(--border); border-radius:10px;
+      padding:10px 12px; overflow:auto; font-size:12.5px; margin:6px 0 0; white-space:pre-wrap; }
+    .cite { display:flex; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); }
+    .cite:last-child { border-bottom:none; }
+    .cite .src { color: var(--accent-2); font-weight:600; font-size: 13.5px; }
+    .cite .score { margin-left:auto; color: var(--muted); font-size:12px; }
+    .cite .snip { color: var(--muted); font-size:12.5px; }
+    .err { color: var(--danger); }
+    footer { text-align:center; color:var(--muted); font-size:12px; padding:18px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">IO</div>
+    <div>
+      <h1>InferOps</h1>
+      <p>Local-inference SRE copilot · RAG + autonomous agents</p>
+    </div>
+    <div class="badge" id="backendBadge">backend: <b>…</b></div>
+  </header>
+
+  <main>
+    <div class="composer">
+      <textarea id="query" placeholder="Describe the incident… e.g. checkout-api p99 latency is spiking and pods keep restarting"></textarea>
+      <div class="controls">
+        <select id="mode" title="Reasoning mode">
+          <option value="agent">Agent (autonomous triage)</option>
+          <option value="rag">RAG (grounded Q&amp;A)</option>
+        </select>
+        <input type="text" id="service" placeholder="service (optional) e.g. checkout-api" />
+        <button id="send">Diagnose</button>
+      </div>
+      <div class="chips" id="examples">
+        <span class="chip" data-svc="checkout-api">checkout-api keeps OOMKilling &amp; CrashLooping</span>
+        <span class="chip" data-svc="payments-svc">payments-svc p99 latency spiking</span>
+        <span class="chip" data-svc="inventory-worker">inventory-worker disk pressure</span>
+      </div>
+    </div>
+
+    <section class="result" id="result">
+      <div class="card">
+        <h3>Inference</h3>
+        <div class="stats" id="stats"></div>
+      </div>
+      <div class="card">
+        <h3>Answer</h3>
+        <div class="answer" id="answer"></div>
+      </div>
+      <div class="card" id="stepsCard">
+        <h3>Agent reasoning trace</h3>
+        <div id="steps"></div>
+      </div>
+      <div class="card" id="citeCard">
+        <h3>Grounded sources (RAG)</h3>
+        <div id="citations"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>InferOps · FastAPI · Ollama · runs fully offline with a deterministic fallback engine</footer>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => (s ?? "").replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+    async function loadHealth() {
+      try {
+        const h = await (await fetch('/health')).json();
+        $('backendBadge').innerHTML = `backend: <b>${h.active_backend}</b> · ${h.documents_indexed} runbooks`;
+      } catch (e) { $('backendBadge').innerHTML = 'backend: <b>offline</b>'; }
+    }
+
+    function renderStats(s) {
+      const cls = s.backend === 'ollama' ? 'ollama' : 'fallback';
+      $('stats').innerHTML = `
+        <div class="stat"><div class="k">Backend</div><div class="v"><span class="pill ${cls}">${esc(s.backend)}</span></div></div>
+        <div class="stat"><div class="k">Model</div><div class="v" style="font-size:15px">${esc(s.model)}</div></div>
+        <div class="stat"><div class="k">LLM calls</div><div class="v">${s.llm_calls}</div></div>
+        <div class="stat"><div class="k">Tokens</div><div class="v">${s.completion_tokens}<small> out</small></div></div>
+        <div class="stat"><div class="k">Throughput</div><div class="v">${s.tokens_per_second}<small> tok/s</small></div></div>
+        <div class="stat"><div class="k">Latency</div><div class="v">${s.latency_ms}<small> ms</small></div></div>`;
+    }
+
+    function renderSteps(steps) {
+      const card = $('stepsCard');
+      if (!steps || !steps.length) { card.style.display = 'none'; return; }
+      card.style.display = 'block';
+      $('steps').innerHTML = steps.map(s => `
+        <div class="step">
+          <div class="act">#${s.step} · ${esc(s.action)}(${esc(s.action_input)})</div>
+          ${s.thought ? `<div class="thought">“${esc(s.thought)}”</div>` : ''}
+          <pre>${esc(s.observation)}</pre>
+        </div>`).join('');
+    }
+
+    function renderCitations(cites) {
+      const card = $('citeCard');
+      if (!cites || !cites.length) { card.style.display = 'none'; return; }
+      card.style.display = 'block';
+      $('citations').innerHTML = cites.map(c => `
+        <div class="cite">
+          <span class="src">📘 ${esc(c.source)}</span>
+          <span class="snip">${esc(c.snippet)}</span>
+          <span class="score">${c.score}</span>
+        </div>`).join('');
+    }
+
+    async function diagnose() {
+      const query = $('query').value.trim();
+      if (!query) return;
+      const btn = $('send');
+      btn.disabled = true; btn.textContent = 'Thinking…';
+      $('result').style.display = 'block';
+      $('answer').textContent = 'Running inference…';
+      $('steps').innerHTML = ''; $('citations').innerHTML = ''; $('stats').innerHTML = '';
+      try {
+        const res = await fetch('/api/v1/chat', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            query, mode: $('mode').value,
+            service: $('service').value.trim() || null
+          })
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        renderStats(data.inference);
+        $('answer').textContent = data.answer;
+        renderSteps(data.steps);
+        renderCitations(data.citations);
+      } catch (e) {
+        $('answer').innerHTML = `<span class="err">Request failed: ${esc(e.message)}</span>`;
+        $('stepsCard').style.display = 'none'; $('citeCard').style.display = 'none';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Diagnose';
+      }
+    }
+
+    $('send').addEventListener('click', diagnose);
+    $('query').addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') diagnose();
+    });
+    document.querySelectorAll('.chip').forEach(chip => chip.addEventListener('click', () => {
+      $('query').value = chip.textContent.trim();
+      $('service').value = chip.dataset.svc || '';
+      diagnose();
+    }));
+    loadHealth();
+  </script>
+</body>
+</html>
