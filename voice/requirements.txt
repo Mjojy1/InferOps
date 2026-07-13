@@ -1,0 +1,5 @@
+elevenlabs>=2.58.0
+sounddevice>=0.4.6
+soundfile>=0.12.1
+numpy>=1.24
+httpx>=0.27
